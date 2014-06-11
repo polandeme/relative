@@ -6,9 +6,12 @@ var _ = require('underscore');
 var when = require('when');
 var Read_File = "iphone5s.txt";
 var Write_File = "iphone5s_l1.txt";
+var Write_File_one = "pre.txt";
 
 var initLoop = [];
 var keywords = [];
+var keywords_pre = [' '];
+var count = 0;
 
 function searchAll(keywords){
 	var deferreds = [];
@@ -61,34 +64,29 @@ function readAllKeyWords(){
 
 function writeToFile(data){
 	var deferred = when.defer();
-    for (var i = data.length - 1; i >= 0 && keywords.length < 20; i--) {
-        console.log("keywords_old");
-        console.log(keywords);
+    for (var i = data.length - 1; i >= 0 && keywords.length < 200; i--) {
+        keywords_pre = keywords.slice(0);
         keywords = _.union(keywords, data[i]);
         initLoop = _.union(initLoop, data[i]);
-        // console.log(keywords[i]);
         console.log("wes=" + i);
-        console.log(data[i]);
     };
-    //     console.log(i);
+
     keywords = _.union(keywords, initLoop);
 
-    console.log("all");
-    console.log(keywords);
-     fs.writeFile(Read_File,keywords.toString());
+    fs.writeFile(Write_File_one,keywords.toString());
+    fs.writeFile(Read_File,keywords.toString());
 
-     fs.writeFile(Write_File,keywords.toString(),function(err){
+    fs.writeFile(Write_File,keywords.toString(),function(err){
         if(err) throw err;
         console.log('一共 '+keywords.length+" 条记录 写入完毕！");
     });
      // return deferred.promise;
 }
-// var i = 0;
 function init() {
-    // i ++;
-    // console.log('i=' + i);
-    if(initLoop.length < 20) {
-        // console.log('ds');
+    if(keywords.length < 200 && count <4) {
+        console.log('ds');
+        count++;
+        console.log(count);
         when.all(readAllKeyWords().then(searchAll)).then(writeToFile).then(init);
     }
 }
